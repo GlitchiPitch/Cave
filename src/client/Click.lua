@@ -1,24 +1,30 @@
 local shared = game.ReplicatedStorage.Shared
 local remotes = game.ReplicatedStorage.Remotes
 local types = require(shared.Types)
+local taskTimer = require(shared.TaskTimer)
 
 local view: types.ClickView
-
+local canInvoke = true
 function createItem()
+    if canInvoke then 
+        canInvoke = false
+        taskTimer.startTimer(1, function()
+            canInvoke = true
+        end)
+    else
+        return 
+    end
 
     local invokeInfo: types.ClickInvokeInfo = {
         mouseHit = view.mouse.Hit,
         mouseTarget = view.mouse.Target,
     }
 
-    local result: boolean, msg: string | number = remotes.Click:InvokeServer('createItem', invokeInfo)
-    -- print(result, msg)
-    if result == true then
-        view.setupAmmoLabel(msg)
-    elseif result == false then
-        view.showMsg(msg)
-    end
+    local action: boolean, answer: string | number = remotes.Click:InvokeServer(invokeInfo)
 
+    if view[action] then
+        view[action](answer)
+    end
 end
 
 function init(view_: types.ClickView)

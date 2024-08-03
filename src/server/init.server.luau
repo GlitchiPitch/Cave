@@ -1,7 +1,15 @@
 local server = game.ServerScriptService.Server
-local tunnel = require(server.TunnelGenerator)
+local shared = game.ReplicatedStorage.Shared
+
 local dataManager = require(server.DataManager)
+local types = require(shared.Types)
+
+local tunnel = require(server.TunnelGenerator)
 local click = require(server.Click)
+local itemsSpawner = require(server.ItemsSpawner)
+
+local items: Folder & {Model | BasePart} = game.ServerStorage.Items:GetChildren()
+local itemsFolder: Folder = workspace.Items
 
 function onPlayerAdded(player: Player)
     dataManager.onPlayerAdded(player)
@@ -18,5 +26,14 @@ function init()
 end
 
 dataManager.init()
-click.init()
+
+click.init({
+    items = items,
+} :: types.ServerData)
+
+itemsSpawner.init({
+    items = items,
+    itemsFolder = itemsFolder,
+} :: types.ServerData)
+
 init()

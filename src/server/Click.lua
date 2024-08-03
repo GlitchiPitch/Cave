@@ -3,20 +3,17 @@ local server = game.ServerScriptService.Server
 local remotes = game.ReplicatedStorage.Remotes
 
 local dataManager = require(server.DataManager)
-local taskTimer = require(server.TaskTimer)
+local taskTimer = require(shared.TaskTimer)
 local types = require(shared.Types)
 
--- all items must be anchored in studio
-local items: Folder & {Model | BasePart} = game.ServerStorage.Items:GetChildren()
+local items: {BasePart}
 
 function createItem(player: Player, info: types.ClickInvokeInfo)
 
     local playerData = dataManager.getPlayerData(player)
     if playerData.canSpawnItem then
-        local checkTarget = info.mouseTarget ~= nil and info.mouseTarget:GetAttribute(types.WALL_ATTR) == types.WALL_ATTR_VALUE :: boolean
         local checkAmmo = #playerData.ammo > 0 :: boolean
-        if checkTarget and checkAmmo then
-            
+        if checkAmmo then
             local item = items[playerData.ammo[1]]:Clone()
             item.Parent = playerData.playerItems
             item:PivotTo(info.mouseHit)
@@ -26,26 +23,35 @@ function createItem(player: Player, info: types.ClickInvokeInfo)
                 dataManager.resetSpawnItem(player)
             end)
 
-            return true, #playerData.ammo
+            return 'setupAmmoLabel', #playerData.ammo
         else
-            return false, (not checkTarget and "wrong target") or (checkAmmo and "empty ammo")
+            return 'showMsg', "empty ammo"
         end
     else
-        return false, "Reload"
+        return 'showMsg', "Reload"
     end
+end
+
+function addAmmo(player: Player, info: types.ClickInvokeInfo)
+    dataManager.addAmmo(player, info.mouseTarget:GetAttribute(types.ITEM_INDEX_ATTR))
+    return 'setupAmmoLabel', #dataManager.getPlayerData(player).ammo
 end
 
 local actions = {
-    createItem = createItem,
+    [types.WALL_ATTR_VALUE] = createItem,
+    [types.ITEM_ATTR_VALUE] = addAmmo,
 }
 
-function invoke(player: Player, action: string, ...)
-    if actions[action] then
-        return actions[action](player, ...)
+function invoke(player: Player, info: types.ClickInvokeInfo)
+    if info.mouseTarget then
+        if actions[info.mouseTarget:GetAttribute(types.ATTR)] then
+            return actions[info.mouseTarget:GetAttribute(types.ATTR)](player, info)
+        end
     end
 end
 
-function init(serverData: {})
+function init(serverData: types.ServerData)
+    items = serverData.items
     remotes.Click.OnServerInvoke = invoke
 end
 

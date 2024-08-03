@@ -8,6 +8,11 @@ export type PlayerData = {
     canSpawnItem: boolean,
 }
 
+export type ServerData = {
+    items: Folder & {BasePart},
+    itemsFolder: Folder?,
+}
+
 export type ClickView = {
     mouse: Mouse,
     showMsg: (ammo: number, msg: string) -> (),
@@ -19,10 +24,16 @@ export type ClickInvokeInfo = {
     mouseTarget: BasePart | nil,
 }
 
-local WALL_ATTR = "Type"
+local ATTR = "Type"
 local WALL_ATTR_VALUE = 'Wall'
+local ITEM_ATTR_VALUE = 'Item'
+local DIRECTION_WALL_ATTR = 'Dir'
+local ITEM_INDEX_ATTR = 'Index'
 
 return {
-    WALL_ATTR = WALL_ATTR,
+    ATTR = ATTR,
     WALL_ATTR_VALUE = WALL_ATTR_VALUE,
+    ITEM_ATTR_VALUE = ITEM_ATTR_VALUE,
+    DIRECTION_WALL_ATTR = DIRECTION_WALL_ATTR,
+    ITEM_INDEX_ATTR = ITEM_INDEX_ATTR,
 }

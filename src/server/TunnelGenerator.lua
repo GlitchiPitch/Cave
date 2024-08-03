@@ -1,5 +1,9 @@
 local shared = game.ReplicatedStorage.Shared
 local server = game.ServerScriptService.Server
+local serverStorage = game.ServerStorage
+
+local events = serverStorage.Events
+
 local pg = require(server.PathGenerator)
 local types = require(shared.Types)
 
@@ -15,7 +19,7 @@ local colors = {
 
 function removeWall(i: number, cell: Model, prevPoint: Vector3, nextPoint: Vector3)
 	for _, wall: Part in cell:GetChildren() do	
-		local dir = wall:GetAttribute('Dir')
+		local dir = wall:GetAttribute(types.DIRECTION_WALL_ATTR)
 		if (nextPoint and dir == nextPoint) or (prevPoint and dir == prevPoint) or (i == 1 and dir == -Vector3.zAxis) then
 			wall:Destroy()
 		end
@@ -27,7 +31,7 @@ function killWall(wall: Part)
 	wall.Touched:Connect(function(hit: Part)
 		local humanoid = hit.Parent:FindFirstChildOfClass('Humanoid') :: Humanoid
 		if humanoid then
-			humanoid.Health = 0
+			-- humanoid.Health = 0
 		end
 	end)
 end
@@ -38,7 +42,7 @@ function untouchedWall(wall: Part)
 	wall.BrickColor = colors.untouched
 end
 
-function setupCheckpoint(checkpoint: Part)
+function setupCheckpoint(checkpoint: Part, itemSpawnPoint: BasePart)
 	checkpoint.BrickColor = colors.checkpoint
 	checkpoint.Touched:Connect(function(hit: Part)
 		if hit and hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
@@ -47,6 +51,7 @@ function setupCheckpoint(checkpoint: Part)
 			if not checkpointData then
 				checkpointData = Instance.new("Model", game.ServerStorage)
 				checkpointData.Name = "CheckpointData"
+				events.SpawnItem:Fire(itemSpawnPoint)
 			end
 			
 			local checkpoint = checkpointData:FindFirstChild(tostring(player.UserId))
@@ -73,13 +78,13 @@ function setupWalls(blockIndex: number, block: Model)
 		if blockIndex % 3 == 0 then
 			local dir = wall:GetAttribute('Dir')
 			if dir == -Vector3.yAxis then
-				setupCheckpoint(wall)
+				setupCheckpoint(wall, block.PrimaryPart)
 			end
 		else
 			if i == untouchedWall_ then
 				untouchedWall(wall)
 			else
-				wall:SetAttribute(types.WALL_ATTR, types.WALL_ATTR_VALUE)
+				wall:SetAttribute(types.ATTR, types.WALL_ATTR_VALUE)
 				if math.random(0,1) == 0 then
 					killWall(wall)
 				end
