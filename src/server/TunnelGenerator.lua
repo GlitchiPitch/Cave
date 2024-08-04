@@ -1,5 +1,6 @@
 local shared = game.ReplicatedStorage.Shared
 local server = game.ServerScriptService.Server
+local events = game.ServerStorage.Events
 local pg = require(server.PathGenerator)
 local obstaclesSpawner = require(server.ObstaclesSpawner)
 local types = require(shared.Types)
@@ -44,6 +45,18 @@ function createTunnel()
 	end
 end
 
+function clearTunnel()
+	for i, block in blocksFolder:GetChildren() do
+		task.wait(1)
+		block:Destroy()
+	end
+end
+
+function init()
+	events.TunnelBind.Event:Connect(clearTunnel)
+end
+
 return {
+	init = init,
 	createTunnel = createTunnel,
 }

@@ -12,8 +12,9 @@ local items: Folder & {Model | BasePart} = game.ServerStorage.Items:GetChildren(
 local itemsFolder: Folder = workspace.Items
 
 function onPlayerAdded(player: Player)
-    dataManager.onPlayerAdded(player)
+    game.ServerStorage.leaderstats:Clone().Parent = player
     player.CharacterAdded:Connect(function(character: Model)
+        dataManager.onPlayerAdded(player)
         local humanoid = character:FindFirstChildOfClass('Humanoid') :: Humanoid
         humanoid.WalkSpeed = 30
         humanoid.JumpPower = 100
@@ -22,10 +23,13 @@ end
 
 function init()
     game.Players.PlayerAdded:Connect(onPlayerAdded)
+    game.Players.PlayerRemoving:Connect(dataManager.onPlayerRemoved)
+    game.
     tunnel.createTunnel()
 end
 
 dataManager.init()
+tunnel.init()
 
 click.init({
     items = items,

@@ -39,6 +39,12 @@ function resetSpawnItem(player: Player)
     sessionData[player].canSpawnItem = true
 end
 
+function addWin(player: Player)
+   local leaderstats = player:FindFirstChild('leaderstats')
+   local wins = leaderstats:FindFirstChild('Wins') :: IntValue
+   wins.Value += 1
+end
+
 function init()
     remotes.Data.OnServerInvoke = getPlayerData
 end
@@ -53,4 +59,5 @@ return {
     addAmmo = addAmmo,
     removeAmmo = removeAmmo,
     resetSpawnItem = resetSpawnItem,
+    addWin = addWin,
 }

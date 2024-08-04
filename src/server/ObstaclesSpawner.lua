@@ -1,8 +1,9 @@
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local shared = game.ReplicatedStorage.Shared
+local server = game.ServerScriptService.Server
 local serverStorage = game.ServerStorage
-
+local dataManager = require(server.DataManager)
 local events = serverStorage.Events
 
 local types = require(shared.Types)
@@ -147,6 +148,19 @@ function checkpointBlock(block: Model)
 end
 
 function finishBlock(block: Model)
+    local _, size = block:GetBoundingBox()
+    block.PrimaryPart.Size = size
+    block.PrimaryPart.Transparency = .5
+    block.PrimaryPart.CanCollide = false
+
+    block.PrimaryPart.Touched:Connect(function(hit: Part)
+        local player = game.Players:GetPlayerFromCharacter(hit.Parent)
+        if player then
+            events.TunnelBind:Fire()
+            dataManager.addWin(player)
+        end
+    end)
+
     for i, wall in block:GetChildren() do
         wall.BrickColor = BrickColor.Yellow()
     end
