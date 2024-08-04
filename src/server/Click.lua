@@ -9,7 +9,6 @@ local types = require(shared.Types)
 local items: {BasePart}
 
 function createItem(player: Player, info: types.ClickInvokeInfo)
-
     local playerData = dataManager.getPlayerData(player)
     if playerData.canSpawnItem then
         local checkAmmo = #playerData.ammo > 0 :: boolean
@@ -34,6 +33,7 @@ end
 
 function addAmmo(player: Player, info: types.ClickInvokeInfo)
     dataManager.addAmmo(player, info.mouseTarget:GetAttribute(types.ITEM_INDEX_ATTR))
+    info.mouseTarget:Destroy()
     return 'setupAmmoLabel', #dataManager.getPlayerData(player).ammo
 end
 

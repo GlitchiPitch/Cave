@@ -5,7 +5,8 @@ local taskTimer = require(shared.TaskTimer)
 
 local view: types.ClickView
 local canInvoke = true
-function createItem()
+
+function onClick()
     if canInvoke then 
         canInvoke = false
         taskTimer.startTimer(1, function()
@@ -35,5 +36,5 @@ end
 
 return {
     init = init,
-    createItem = createItem,
+    onClick = onClick,
 }

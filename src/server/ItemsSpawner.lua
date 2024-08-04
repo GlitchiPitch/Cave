@@ -25,6 +25,7 @@ function setupItem(item: BasePart, spawnPoint: BasePart, itemIndex: number)
     item.Anchored = false
     item.Parent = itemsFolder
     item.Position = spawnPoint.Position
+    item:ApplyImpulseAtPosition(item.Size * .5, spawnPoint.Position + Vector3.yAxis * 5)
 end
 
 function spawnItems(spawnPoint: BasePart)

@@ -22,7 +22,7 @@ function setupAmmoLabel(ammo: number)
 end
 
 function init()
-    mouse.Button1Down:Connect(click.createItem)
+    mouse.Button1Down:Connect(click.onClick)
 end
 
 local view: types.ClickView = {
